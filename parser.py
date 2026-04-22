@@ -2,6 +2,9 @@ import shlex
 
 def parse(input_string):
     parts = shlex.split(input_string)
+
+    if input_string == "":
+        return
     
     command = parts[0]
     options = {}
