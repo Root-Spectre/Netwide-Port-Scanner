@@ -8,18 +8,19 @@ def run(options):
     if not target:
         print("Enter a Target.")
 
-    if not timeout:
-        timeout = 0.5
-
         return
+
+    if not timeout:
+        timeout = 1
+
     print(f"Scanning {target}...")
     
     if port:
         port = int(port)
-        scan_port(target, port)
+        scan_port(target, port, timeout)
     else:
         for port in range(1, 8888):
-            scan_range(target, port)
+            scan_range(target, port, timeout)
     
 def scan_range(target, port, timeout):
     try:
