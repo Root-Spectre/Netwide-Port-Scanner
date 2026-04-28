@@ -3,15 +3,12 @@ import socket
 def run(options):
     target = options.get("target", None)
     port = options.get("p")
-    timeout = options.get("t")
+    timeout = float(options.get("t", 1))
 
     if not target:
         print("Enter a Target.")
 
         return
-
-    if not timeout:
-        timeout = 1
 
     print(f"Scanning {target}...")
     
