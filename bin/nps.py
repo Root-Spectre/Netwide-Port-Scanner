@@ -3,9 +3,13 @@ import socket
 def run(options):
     target = options.get("target", None)
     port = options.get("p")
+    timeout = options.get("t")
 
     if not target:
         print("Enter a Target.")
+
+    if not timeout:
+        timeout = 0.5
 
         return
     print(f"Scanning {target}...")
@@ -17,10 +21,10 @@ def run(options):
         for port in range(1, 8888):
             scan_range(target, port)
     
-def scan_range(target, port):
+def scan_range(target, port, timeout):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(1)
+        sock.settimeout(timeout)
 
         result = sock.connect_ex((target, int(port)))
         if result == 0:
@@ -30,10 +34,10 @@ def scan_range(target, port):
     except Exception as e:
         print(e)
 
-def scan_port(target, port):
+def scan_port(target, port, timeout):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(1)
+        sock.settimeout(timeout)
 
         result = sock.connect_ex((target, int(port)))
         if result == 0:
