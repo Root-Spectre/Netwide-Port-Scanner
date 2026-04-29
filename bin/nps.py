@@ -1,74 +1,90 @@
 import socket
+from concurrent.futures import ThreadPoolExecutor
 
 def run(options):
-    target = options.get("target", None)
-    port = options.get("p")
-    timeout = float(options.get("t", 1))
-    fast_mode = options.get("fast", False)
-    full_scan = options.get("full", False)
+    try:
+        target = options.get("target", None)
+        port = options.get("p")
+        timeout = float(options.get("t", 1))
+        threads = int(options.get("threads", 200))
+        fast_mode = options.get("fast", False)
+        full_scan = options.get("full", False)
 
-    if not target:
-        print("Enter a Target.")
+        if not target:
+            print("Enter a Target.")
 
-        return
+            return
 
-    print(f"Scanning {target}...")
-    
-    if port:
-        port = int(port)
-        scan_port(target, port, timeout, True)
-    elif fast_mode:
-        FAST_PORTS = [
-            20,
-            21,
-            22,
-            23,
-            25,
-            53,
-            67,
-            68,
-            69,
-            80,
-            88,
-            110,
-            111,
-            113,
-            119,
-            123,
-            135,
-            137,
-            138,
-            139,
-            143,
-            161,
-            162,
-            179,
-            443,
-            445,
-            464,
-            1433,
-            1900,
-            2049,
-            3000,
-            3306,
-            3389,
-            5000,
-            5900,
-            8000,
-            8080,
-            8333,
-            8443,
-            6379,
-            27017,
-        ]
-        for port in FAST_PORTS:
+        print(f"Scanning {target}...")
+        
+        if port:
+            port = int(port)
             scan_port(target, port, timeout, True)
-    elif full_scan:
-        for port in range(1, 65536):
-            scan_port(target, port, timeout, False)
-    else:
-        for port in range(1, 8888):
-            scan_port(target, port, timeout, False)
+            print("Scan Finished.")
+        elif fast_mode:
+            FAST_PORTS = [
+                20,
+                21,
+                22,
+                23,
+                25,
+                53,
+                67,
+                68,
+                69,
+                80,
+                88,
+                110,
+                111,
+                113,
+                119,
+                123,
+                135,
+                137,
+                138,
+                139,
+                143,
+                161,
+                162,
+                179,
+                443,
+                445,
+                464,
+                1433,
+                1900,
+                2049,
+                3000,
+                3306,
+                3389,
+                5000,
+                5900,
+                8000,
+                8080,
+                8333,
+                8443,
+                6379,
+                27017,
+            ]
+
+            with ThreadPoolExecutor(max_workers=threads) as executor:
+                for port in FAST_PORTS:
+                    executor.submit(scan_port, target, port, timeout, True)
+
+            print("Scan Finished.")
+        elif full_scan:
+            with ThreadPoolExecutor(max_workers=threads) as executor:
+                for port in range(1, 65536):
+                    executor.submit(scan_port, target, port, timeout, False)
+
+            print("Scan Finished.")
+        else:
+            with ThreadPoolExecutor(max_workers=threads) as executor:
+                for port in range(1, 10000):
+                    executor.submit(scan_port, target, port, timeout, False)
+
+            print("Scan Finished.")
+    except KeyboardInterrupt:
+        print("Scan Interrupted.")
 
 def scan_port(target, port, timeout, scp):
     try:
